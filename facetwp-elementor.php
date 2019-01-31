@@ -17,6 +17,7 @@ class FacetWP_El_Integration {
 
     private static $instance;
     private $elements;
+    public $post_clauses = false;
 
     function __construct() {
 
@@ -35,7 +36,7 @@ class FacetWP_El_Integration {
 
     function setup_elementor() {
 
-        $this->elements = apply_filters( 'facetwp_elementor_elements', array( 'posts', 'archive-posts' ) ); 
+        $this->elements = apply_filters( 'facetwp_elementor_elements', array( 'posts', 'archive-posts', 'woocommerce-products', 'woocommerce-archive-products' ) ); 
 
         add_action( 'elementor/element/after_section_end', array( $this, 'register_controls' ), 10, 3 );
         add_action( 'elementor/widget/before_render_content', array( $this, 'add_template_class' ) );
@@ -44,7 +45,7 @@ class FacetWP_El_Integration {
 
     function register_controls( $element, $section_id, $args ) {
         
-        if ( 'section_layout' === $section_id && in_array( $element->get_name(), $this->elements ) ) {
+        if ( in_array( $section_id, array( 'section_layout', 'section_content' ) ) && in_array( $element->get_name(), $this->elements ) ) {
 
             $element->start_controls_section(
                 'facetwp_section',
@@ -78,6 +79,10 @@ class FacetWP_El_Integration {
 
         if ( '' !== $query->get( 'facetwp' ) ) {
             $is_main_query = (bool) $query->get( 'facetwp' );
+        }
+
+        if ( is_post_type_archive( 'product' ) && true != $query->get( 'facetwp' ) ) {
+            $is_main_query = false;
         }
 
         return $is_main_query;
@@ -116,6 +121,12 @@ class FacetWP_El_Integration {
                     // don't think we need this hook
                     //add_action( 'elementor/theme/posts_archive/query_posts/query_vars', function( $query_vars ) {
                     //} );
+
+                } elseif ( 'woocommerce-archive-products' == $widget->get_name() ) {
+
+                    add_filter( 'pre_get_posts', function( $query ) {
+                        $query->set( 'facetwp', true );
+                    });
 
                 } else {
 
