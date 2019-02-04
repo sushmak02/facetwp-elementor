@@ -17,12 +17,11 @@ class FacetWP_El_Integration {
 
     private static $instance;
     private $elements;
-    public $post_clauses = false;
+    private $is_elementor = false;
 
     function __construct() {
 
-        add_action( 'plugins_loaded', array( $this, 'setup_elementor' ) );
-        add_filter( 'facetwp_is_main_query', array( $this, 'is_main_query' ), 10, 2 );
+        add_action( 'elementor/init', array( $this, 'setup_elementor' ) );
 
     }
 
@@ -36,10 +35,29 @@ class FacetWP_El_Integration {
 
     function setup_elementor() {
 
-        $this->elements = apply_filters( 'facetwp_elementor_elements', array( 'posts', 'archive-posts', 'woocommerce-products', 'woocommerce-archive-products' ) ); 
+        $this->elements = apply_filters( 'facetwp_elementor_elements', array( 'posts', 'archive-posts', 'woocommerce-products', 'woocommerce-archive-products' ) );
 
+        add_filter( 'pre_get_posts', array( $this, 'check_current_page' ), 1 );
+        add_filter( 'facetwp_is_main_query', array( $this, 'is_main_query' ), 10, 2 );
         add_action( 'elementor/element/after_section_end', array( $this, 'register_controls' ), 10, 3 );
         add_action( 'elementor/widget/before_render_content', array( $this, 'add_template_class' ) );
+    }
+
+    function check_current_page( $query ) {
+
+        if ( ! $this->is_elementor ) {
+
+            if ( \Elementor\Plugin::$instance->db->is_built_with_elementor( get_queried_object_id() ) ) {
+                $this->is_elementor = true;
+            } elseif ( ( function_exists( 'is_shop' ) && is_shop() ) || is_archive() || is_tax() || is_home() || is_search() ) {
+                $location = 'archive';
+                $location_documents =  \ElementorPro\Plugin::instance()->modules_manager->get_modules('theme-builder')->get_conditions_manager()->get_documents_for_location( $location );
+                if ( !empty( $location_documents ) ) {
+                    $this->is_elementor = true;
+                }
+            }
+            
+        }
 
     }
 
@@ -81,7 +99,7 @@ class FacetWP_El_Integration {
             $is_main_query = (bool) $query->get( 'facetwp' );
         }
 
-        if ( is_post_type_archive( 'product' ) && true != $query->get( 'facetwp' ) ) {
+        if ( is_post_type_archive() && $this->is_elementor && true != $query->get( 'facetwp' ) ) {
             $is_main_query = false;
         }
 
