@@ -1,0 +1,1 @@
+# FacetWP - Elementor integration
