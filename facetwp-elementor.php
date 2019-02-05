@@ -99,7 +99,7 @@ class FacetWP_El_Integration {
             $is_main_query = (bool) $query->get( 'facetwp' );
         }
 
-        if ( is_post_type_archive() && $this->is_elementor && true != $query->get( 'facetwp' ) ) {
+        if ( is_archive() && $this->is_elementor && true != $query->get( 'facetwp' ) ) {
             $is_main_query = false;
         }
 
