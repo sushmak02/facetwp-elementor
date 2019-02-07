@@ -162,7 +162,9 @@ class FacetWP_El_Integration {
             <script>
                 (function($) {
                     $(document).on('facetwp-loaded', function() {
-                        elementorFrontend.init();
+                        if ( undefined !== 'elementorFrontend' ) {
+                            elementorFrontend.init();
+                        }
                     });
                 })(jQuery);
             </script>
