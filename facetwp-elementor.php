@@ -41,6 +41,7 @@ class FacetWP_El_Integration {
         add_filter( 'facetwp_is_main_query', array( $this, 'is_main_query' ), 10, 2 );
         add_action( 'elementor/element/after_section_end', array( $this, 'register_controls' ), 10, 3 );
         add_action( 'elementor/widget/before_render_content', array( $this, 'add_template_class' ) );
+        add_action( 'wp_footer', array( $this, 'add_scripts' ), 100 );
     }
 
     function check_current_page( $query ) {
@@ -154,6 +155,18 @@ class FacetWP_El_Integration {
 
             }
         }
+    }
+
+    function add_scripts() {
+        if ( $this->is_elementor ) : ?>
+            <script>
+                (function($) {
+                    $(document).on('facetwp-loaded', function() {
+                        elementorFrontend.init();
+                    });
+                })(jQuery);
+            </script>
+        <?php endif;
     }
 }
 
