@@ -10,10 +10,7 @@ GitHub URI: facetwp/facetwp-elementor
 
 defined( 'ABSPATH' ) or exit;
 
-// setup constants.
-define( 'FWEL_VER', '0.1.0' );
-
-class FacetWP_El_Integration {
+class FacetWP_Elementor_Addon {
 
     private static $instance;
     private $elements;
@@ -22,6 +19,10 @@ class FacetWP_El_Integration {
 
     function __construct() {
 
+        // setup variables
+        define( 'FACETWP_ELEMENTOR_VERSION', '0.1.0' );
+
+        // get the gears turning
         add_action( 'elementor/init', array( $this, 'setup_elementor' ) );
 
     }
@@ -37,13 +38,13 @@ class FacetWP_El_Integration {
     function setup_elementor() {
 
         $this->is_pro = defined( 'ELEMENTOR_PRO_VERSION' );
-        $this->elements = apply_filters( 'facetwp_elementor_elements', array( 'posts', 'archive-posts', 'woocommerce-products', 'woocommerce-archive-products' ) );
+        $this->elements = apply_filters( 'facetwp_elementor_elements', [ 'posts', 'archive-posts', 'woocommerce-products', 'woocommerce-archive-products' ] );
 
-        add_filter( 'pre_get_posts', array( $this, 'check_current_page' ), 1 );
-        add_filter( 'facetwp_is_main_query', array( $this, 'is_main_query' ), 10, 2 );
-        add_action( 'elementor/element/after_section_end', array( $this, 'register_controls' ), 10, 3 );
-        add_action( 'elementor/widget/before_render_content', array( $this, 'add_template_class' ) );
-        add_filter( 'facetwp_assets', array( $this, 'front_scripts' ) );
+        add_filter( 'pre_get_posts', [ $this, 'check_current_page' ], 1 );
+        add_filter( 'facetwp_is_main_query', [ $this, 'is_main_query' ], 10, 2 );
+        add_action( 'elementor/element/after_section_end', [ $this, 'register_controls' ], 10, 3 );
+        add_action( 'elementor/widget/before_render_content', [ $this, 'add_template_class' ] );
+        add_filter( 'facetwp_assets', [ $this, 'front_scripts' ] );
     }
 
     function check_current_page( $query ) {
@@ -54,10 +55,11 @@ class FacetWP_El_Integration {
                 $this->is_elementor = true;
             }
             elseif ( is_archive() || is_tax() || is_home() || is_search() ) {
+
                 if ( $this->is_pro ) {
                     $location = 'archive';
-                    $location_documents =  \ElementorPro\Plugin::instance()->modules_manager->get_modules('theme-builder')->get_conditions_manager()->get_documents_for_location( $location );
-                    if ( !empty( $location_documents ) ) {
+                    $location_documents = \ElementorPro\Plugin::instance()->modules_manager->get_modules('theme-builder')->get_conditions_manager()->get_documents_for_location( $location );
+                    if ( ! empty( $location_documents ) ) {
                         $this->is_elementor = true;
                     }
                 }
@@ -66,24 +68,20 @@ class FacetWP_El_Integration {
     }
 
     function register_controls( $element, $section_id, $args ) {
-        
-        if ( in_array( $section_id, array( 'section_layout', 'section_content' ) ) && in_array( $element->get_name(), $this->elements ) ) {
 
-            $element->start_controls_section(
-                'facetwp_section',
-                [
-                    'label' => __( 'FacetWP', 'plugin-name' ),
+        if ( in_array( $section_id, [ 'section_layout', 'section_content' ] ) && in_array( $element->get_name(), $this->elements ) ) {
+
+            $element->start_controls_section( 'facetwp_section', [
+                    'label' => __( 'FacetWP', 'facetwp-elementor' ),
                     'tab' => \Elementor\Controls_Manager::TAB_CONTENT,
                 ]
             );
 
-            $element->add_control(
-                'enable_facetwp',
-                [
-                    'label' => __( 'Enable FacetWP', 'fwp' ),
+            $element->add_control( 'enable_facetwp', [
+                    'label' => __( 'Enable FacetWP', 'facetwp-elementor' ),
                     'type' => \Elementor\Controls_Manager::SWITCHER,
-                    'label_on' => __( 'Yes', 'your-plugin' ),
-                    'label_off' => __( 'No', 'your-plugin' ),
+                    'label_on' => __( 'Yes', 'facetwp-elementor' ),
+                    'label_off' => __( 'No', 'facetwp-elementor' ),
                     'return_value' => 'yes',
                     'default' => 'no'
                 ]
@@ -118,11 +116,7 @@ class FacetWP_El_Integration {
         
             if ( ! empty( $settings['enable_facetwp'] && 'yes' == $settings['enable_facetwp'] ) ) {
 
-                $widget->add_render_attribute(
-                    '_wrapper', 'class', [
-                        'facetwp-template'
-                    ]
-                );
+                $widget->add_render_attribute( '_wrapper', 'class', [ 'facetwp-template' ] );
 
                 if ( empty( $settings['posts_query_id'] ) ) {
 
@@ -137,24 +131,17 @@ class FacetWP_El_Integration {
                         $query->set( 'facetwp', true );
                     }, 10, 2 );
 
-                //} elseif ( 'archive-posts' == $widget->get_name() ) {
-
-                    // don't think we need this hook
-                    //add_action( 'elementor/theme/posts_archive/query_posts/query_vars', function( $query_vars ) {
-                    //} );
-
-                } elseif ( 'woocommerce-archive-products' == $widget->get_name() ) {
+                }
+                elseif ( 'woocommerce-archive-products' == $widget->get_name() ) {
 
                     add_filter( 'pre_get_posts', function( $query ) {
                         $query->set( 'facetwp', true );
                     });
 
-                } else {
-
-                    do_action( 'facetwp_elementor_query', $widget->get_name() );
-
                 }
-
+                else {
+                    do_action( 'facetwp_elementor_query', $widget->get_name() );
+                }
             }
         }
     }
@@ -167,4 +154,4 @@ class FacetWP_El_Integration {
     }
 }
 
-FacetWP_El_Integration::init();
+FacetWP_Elementor_Addon::init();
