@@ -78,12 +78,11 @@ class FacetWP_El_Integration {
                 'enable_facetwp',
                 [
                     'label' => __( 'Enable FacetWP', 'fwp' ),
-                    'type' => \Elementor\Controls_Manager::SELECT,
-                    'default' => 'no',
-                    'options' => [
-                        'no' => __( 'No', 'fwp' ),
-                        'yes' => __( 'Yes', 'fwp' ),
-                    ],
+                    'type' => \Elementor\Controls_Manager::SWITCHER,
+                    'label_on' => __( 'Yes', 'your-plugin' ),
+                    'label_off' => __( 'No', 'your-plugin' ),
+                    'return_value' => 'yes',
+                    'default' => 'no'
                 ]
             );
 
