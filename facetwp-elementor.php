@@ -50,7 +50,7 @@ class FacetWP_El_Integration {
 
             if ( \Elementor\Plugin::$instance->db->is_built_with_elementor( get_queried_object_id() ) ) {
                 $this->is_elementor = true;
-            } elseif ( ( function_exists( 'is_shop' ) && is_shop() ) || is_archive() || is_tax() || is_home() || is_search() ) {
+            } elseif ( is_archive() || is_tax() || is_home() || is_search() ) {
                 $location = 'archive';
                 $location_documents =  \ElementorPro\Plugin::instance()->modules_manager->get_modules('theme-builder')->get_conditions_manager()->get_documents_for_location( $location );
                 if ( !empty( $location_documents ) ) {
