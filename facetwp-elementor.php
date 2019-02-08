@@ -18,6 +18,7 @@ class FacetWP_El_Integration {
     private static $instance;
     private $elements;
     private $is_elementor = false;
+    private $is_pro = false;
 
     function __construct() {
 
@@ -35,6 +36,7 @@ class FacetWP_El_Integration {
 
     function setup_elementor() {
 
+        $this->is_pro = defined( 'ELEMENTOR_PRO_VERSION' );
         $this->elements = apply_filters( 'facetwp_elementor_elements', array( 'posts', 'archive-posts', 'woocommerce-products', 'woocommerce-archive-products' ) );
 
         add_filter( 'pre_get_posts', array( $this, 'check_current_page' ), 1 );
@@ -50,16 +52,17 @@ class FacetWP_El_Integration {
 
             if ( \Elementor\Plugin::$instance->db->is_built_with_elementor( get_queried_object_id() ) ) {
                 $this->is_elementor = true;
-            } elseif ( is_archive() || is_tax() || is_home() || is_search() ) {
-                $location = 'archive';
-                $location_documents =  \ElementorPro\Plugin::instance()->modules_manager->get_modules('theme-builder')->get_conditions_manager()->get_documents_for_location( $location );
-                if ( !empty( $location_documents ) ) {
-                    $this->is_elementor = true;
+            }
+            elseif ( is_archive() || is_tax() || is_home() || is_search() ) {
+                if ( $this->is_pro ) {
+                    $location = 'archive';
+                    $location_documents =  \ElementorPro\Plugin::instance()->modules_manager->get_modules('theme-builder')->get_conditions_manager()->get_documents_for_location( $location );
+                    if ( !empty( $location_documents ) ) {
+                        $this->is_elementor = true;
+                    }
                 }
             }
-            
         }
-
     }
 
     function register_controls( $element, $section_id, $args ) {
