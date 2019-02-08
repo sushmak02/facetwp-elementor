@@ -41,7 +41,7 @@ class FacetWP_El_Integration {
         add_filter( 'facetwp_is_main_query', array( $this, 'is_main_query' ), 10, 2 );
         add_action( 'elementor/element/after_section_end', array( $this, 'register_controls' ), 10, 3 );
         add_action( 'elementor/widget/before_render_content', array( $this, 'add_template_class' ) );
-        add_action( 'wp_footer', array( $this, 'add_scripts' ), 100 );
+        add_filter( 'facetwp_assets', array( $this, 'front_scripts' ) );
     }
 
     function check_current_page( $query ) {
@@ -157,37 +157,11 @@ class FacetWP_El_Integration {
         }
     }
 
-    function add_scripts() {
-        if ( $this->is_elementor ) : ?>
-            <script>
-                (function($) {
-                    $(document).on('facetwp-loaded', function() {
-                        if ( undefined !== 'elementorFrontend' ) {
-                            elementorFrontend.init();
-                        }
-                    });
-                    $(document).on('click', '.facetwp-template .elementor-pagination a', function(e) {
-                        e.preventDefault();
-                        var matches = $(this).attr('href').match(/\/page\/(\d+)/);
-                        if (null !== matches) {
-                            FWP.paged = parseInt(matches[1]);
-                            FWP.soft_refresh = true;
-                            FWP.refresh();
-                        }
-                    });
-                    $(document).on('click', '.facetwp-template .woocommerce-pagination a', function(e) {
-                        e.preventDefault();
-                        var matches = $(this).attr('href').match(/product-page=(\d+);
-                        console.log( matches )
-                        if (null !== matches) {
-                            FWP.paged = parseInt(matches[1]);
-                            FWP.soft_refresh = true;
-                            FWP.refresh();
-                        }
-                    });
-                })(jQuery);
-            </script>
-        <?php endif;
+    function front_scripts( $assets ) {
+        if ( $this->is_elementor ) {
+            $assets['facetwp-elementor-front.js'] = plugins_url( '', __FILE__ ) . '/assets/js/front.js';
+        }
+        return $assets;
     }
 }
 
