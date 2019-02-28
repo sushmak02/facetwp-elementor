@@ -23,7 +23,7 @@ class FacetWP_Elementor_Addon {
         define( 'FACETWP_ELEMENTOR_VERSION', '0.1.0' );
 
         // get the gears turning
-        add_action( 'elementor/init', array( $this, 'setup_elementor' ) );
+        add_action( 'elementor_pro/init', [ $this, 'setup_elementor' ] );
 
     }
 
