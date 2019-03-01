@@ -138,8 +138,8 @@ class FacetWP_Elementor_Addon {
      */
     function is_main_query( $is_main_query, $query ) {
 
-        if ( '' !== $query->get( 'facetwp' ) ) {
-            $is_main_query = (bool) $query->get( 'facetwp' );
+        if ( ( is_archive() || is_tax() || is_home() || is_search() ) && ! ( function_exists( 'is_shop' ) && is_shop() ) ) {
+            return $is_main_query;
         }
 
         if ( $this->is_elementor && true != $query->get( 'facetwp' ) ) {
@@ -175,7 +175,7 @@ class FacetWP_Elementor_Addon {
                     }, 10, 2 );
 
                 }
-                elseif ( 'woocommerce-archive-products' == $widget->get_name() ) {
+                elseif ( 'woocommerce-archive-products' == $widget->get_name() || 'woocommerce-products' == $widget->get_name() ) {
 
                     add_filter( 'pre_get_posts', function( $query ) {
                         $query->set( 'facetwp', true );
