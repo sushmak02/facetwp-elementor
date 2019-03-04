@@ -2,7 +2,7 @@
 /*
 Plugin Name: FacetWP - Elementor
 Description: FacetWP and Elementor Integration
-Version: 0.1.0
+Version: 1.0
 Author: FacetWP, LLC
 Author URI: https://facetwp.com/
 GitHub URI: facetwp/facetwp-elementor
@@ -24,7 +24,7 @@ class FacetWP_Elementor_Addon {
     function __construct() {
 
         // setup variables
-        define( 'FACETWP_ELEMENTOR_VERSION', '0.1.0' );
+        define( 'FACETWP_ELEMENTOR_VERSION', '1.0' );
 
         // get the gears turning
         add_action( 'elementor_pro/init', [ $this, 'setup_elementor' ] );
