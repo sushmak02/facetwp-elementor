@@ -180,7 +180,7 @@ class FacetWP_Elementor_Addon {
                     }, 10, 2 );
 
                 }
-                elseif ( 'woocommerce-archive-products' == $widget->get_name() || 'woocommerce-products' == $widget->get_name() || 'uael-posts' == $widget->get_name() || 'uael-woo-products' == $widget->get_name() ) {
+                elseif ( in_array( $widget->get_name(), [ 'woocommerce-archive-products', 'woocommerce-products', 'uael-posts', 'uael-woo-products' ] ) ) {
 
                     add_filter( 'pre_get_posts', function( $query ) {
                         $query->set( 'facetwp', true );
