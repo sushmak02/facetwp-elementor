@@ -54,7 +54,9 @@ class FacetWP_Elementor_Addon {
                 'posts',
                 'archive-posts',
                 'woocommerce-products',
-                'woocommerce-archive-products'
+                'woocommerce-archive-products',
+                'uael-posts',
+                'uael-woo-products',
             ]
         );
 
@@ -72,6 +74,10 @@ class FacetWP_Elementor_Addon {
             'section_content' => [
                 'woocommerce-products',
                 'woocommerce-archive-products',
+            ],
+            'section_filter_field' => [
+                'uael-woo-products',
+                'uael-posts',
             ]
         ];
 
@@ -165,7 +171,6 @@ class FacetWP_Elementor_Addon {
 
                     $settings['posts_query_id'] = 'facetwp_query';
                     $widget->set_settings( $settings );
-
                 }
 
                 if ( 'posts' == $widget->get_name() ) {
@@ -175,7 +180,7 @@ class FacetWP_Elementor_Addon {
                     }, 10, 2 );
 
                 }
-                elseif ( 'woocommerce-archive-products' == $widget->get_name() || 'woocommerce-products' == $widget->get_name() ) {
+                elseif ( 'woocommerce-archive-products' == $widget->get_name() || 'woocommerce-products' == $widget->get_name() || 'uael-posts' == $widget->get_name() || 'uael-woo-products' == $widget->get_name() ) {
 
                     add_filter( 'pre_get_posts', function( $query ) {
                         $query->set( 'facetwp', true );
